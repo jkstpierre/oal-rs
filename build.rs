@@ -40,10 +40,6 @@ fn build_openal_soft(openal_directory: PathBuf) {
         .build();
 
     // Set link search for cargo
-    fs::write(
-        env::var("OUT_DIR").unwrap() + "/test.txt",
-        dst.display().to_string(),
-    );
     println!("cargo:rustc-link-search=native={}/build", dst.display());
 
     // Link dynamic libraries
