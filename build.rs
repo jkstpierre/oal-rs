@@ -51,6 +51,9 @@ fn build_openal_soft(openal_directory: PathBuf) {
     println!("cargo:rustc-link-lib={}=openal", "dylib");
 }
 
+/**
+ * Build api bindings to the C functions described in the OpenAL-soft headers
+ */
 fn build_bindings(mut openal_directory: PathBuf) {
     openal_directory = openal_directory.join("include/AL");
 
@@ -70,6 +73,7 @@ fn build_bindings(mut openal_directory: PathBuf) {
 }
 
 fn main() {
+    // Create path for accessing openal-soft C source from github
     let openal_directory = PathBuf::from(env::var("OUT_DIR").unwrap()).join("openal-soft");
 
     build_openal_soft(openal_directory.clone());
