@@ -1,3 +1,4 @@
+extern crate bindgen;
 extern crate cmake;
 
 use cmake::Config;
@@ -6,10 +7,8 @@ use std::{env, fs, path::PathBuf, process::Command};
 /**
  * Clone and build the OpenAL software github repository
  */
-fn build_openal_soft() {
+fn build_openal_soft(openal_directory: PathBuf) {
     const BRANCH: &str = "v1.19";
-
-    let openal_directory = PathBuf::from(env::var("OUT_DIR").unwrap()).join("openal-soft");
 
     // Perform git clone for OpenAL-Soft
     let status = Command::new("git")
@@ -52,6 +51,27 @@ fn build_openal_soft() {
     println!("cargo:rustc-link-lib={}=openal", "dylib");
 }
 
+fn build_bindings(mut openal_directory: PathBuf) {
+    openal_directory = openal_directory.join("include/AL");
+
+    let bindings = bindgen::Builder::default()
+        .header(openal_directory.join("al.h").to_str().unwrap())
+        .header(openal_directory.join("alc.h").to_str().unwrap())
+        .header(openal_directory.join("alext.h").to_str().unwrap())
+        .header(openal_directory.join("efx.h").to_str().unwrap())
+        .header(openal_directory.join("efx-presets.h").to_str().unwrap())
+        .generate()
+        .expect("Unable to generate openal-soft bindings.");
+
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    bindings
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Failed to write bindings!")
+}
+
 fn main() {
-    build_openal_soft()
+    let openal_directory = PathBuf::from(env::var("OUT_DIR").unwrap()).join("openal-soft");
+
+    build_openal_soft(openal_directory.clone());
+    build_bindings(openal_directory)
 }
