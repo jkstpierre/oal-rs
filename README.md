@@ -1,2 +1,2 @@
 # openal-soft-rs
-Rust bindings for OpenAL
+Rust bindings for openal-soft
