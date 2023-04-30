@@ -2,7 +2,7 @@ extern crate bindgen;
 extern crate cmake;
 
 use cmake::Config;
-use std::{env, fs, path::PathBuf, process::Command};
+use std::{env, path::PathBuf, process::Command};
 
 /**
  * Clone and build the OpenAL software github repository
@@ -40,11 +40,14 @@ fn build_openal_soft(openal_directory: PathBuf) {
         .build();
 
     // Set link search for cargo
-    println!("cargo:rustc-link-search=native={}/build", dst.display());
+    println!(
+        "cargo:rustc-link-search=all={}/build/Release",
+        dst.display()
+    );
 
     // Link dynamic libraries
     println!("cargo:rustc-link-lib={}=common", "dylib");
-    println!("cargo:rustc-link-lib={}=openal", "dylib");
+    println!("cargo:rustc-link-lib={}=OpenAL32", "dylib");
 }
 
 /**
