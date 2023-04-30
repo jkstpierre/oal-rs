@@ -31,14 +31,22 @@ fn build_openal_soft(openal_directory: PathBuf) {
     }
 
     // Compile OpenAL-Soft into a shared library
-    let dst = Config::new(openal_directory)
+    let mut dst = Config::new(openal_directory)
         .define("LIBTYPE", "SHARED")
         .define("ALSOFT_UTILS", "OFF")
         .define("ALSOFT_EXAMPLES", "OFF")
         .define("ALSOFT_TESTS", "OFF")
         .no_build_target(true)
-        .build()
-        .join("build/Release");
+        .build();
+
+    #[cfg(debug_assertions)]
+    {
+        dst = dst.join("build/Debug");
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        dst = dst.join("build/Release");
+    }
 
     // Set link search for cargo
     println!("cargo:rustc-link-search=all={}", dst.display());
