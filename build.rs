@@ -32,7 +32,7 @@ fn build_openal_soft(openal_directory: PathBuf) {
 
     // Compile OpenAL-Soft into a shared library
     let dst = Config::new(openal_directory)
-        .define("LIBTYPE", "SHARED")
+        .define("LIBTYPE", "STATIC")
         .define("ALSOFT_UTILS", "OFF")
         .define("ALSOFT_EXAMPLES", "OFF")
         .define("ALSOFT_TESTS", "OFF")
@@ -46,8 +46,8 @@ fn build_openal_soft(openal_directory: PathBuf) {
     );
 
     // Link dynamic libraries
-    println!("cargo:rustc-link-lib={}=common", "dylib");
-    println!("cargo:rustc-link-lib={}=OpenAL32", "dylib");
+    println!("cargo:rustc-link-lib={}=common", "static");
+    println!("cargo:rustc-link-lib={}=OpenAL32", "static");
 }
 
 /**
