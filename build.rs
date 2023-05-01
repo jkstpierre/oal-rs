@@ -1,6 +1,7 @@
 extern crate bindgen;
 extern crate cmake;
 
+use bindgen::callbacks::ParseCallbacks;
 use cmake::Config;
 use std::{env, path::PathBuf, process::Command};
 
@@ -68,6 +69,7 @@ fn build_bindings(mut openal_directory: PathBuf) {
         .header(openal_directory.join("alext.h").to_str().unwrap())
         .header(openal_directory.join("efx.h").to_str().unwrap())
         .header(openal_directory.join("efx-presets.h").to_str().unwrap())
+        .parse_callbacks(Box::new(CustomParse))
         .generate()
         .expect("Unable to generate openal-soft bindings.");
 
@@ -75,6 +77,46 @@ fn build_bindings(mut openal_directory: PathBuf) {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Failed to write bindings!")
+}
+
+#[derive(Debug)]
+struct CustomParse;
+impl ParseCallbacks for CustomParse {
+    fn will_parse_macro(&self, _name: &str) -> bindgen::callbacks::MacroParsingBehavior {
+        bindgen::callbacks::MacroParsingBehavior::Default
+    }
+
+    fn int_macro(&self, _name: &str, _value: i64) -> Option<bindgen::callbacks::IntKind> {
+        Some(bindgen::callbacks::IntKind::I32)
+    }
+
+    fn str_macro(&self, _name: &str, _value: &[u8]) {}
+
+    fn func_macro(&self, _name: &str, _value: &[&[u8]]) {}
+
+    fn enum_variant_behavior(
+        &self,
+        _enum_name: Option<&str>,
+        _original_variant_name: &str,
+        _variant_value: bindgen::callbacks::EnumVariantValue,
+    ) -> Option<bindgen::callbacks::EnumVariantCustomBehavior> {
+        None
+    }
+
+    fn enum_variant_name(
+        &self,
+        _enum_name: Option<&str>,
+        _original_variant_name: &str,
+        _variant_value: bindgen::callbacks::EnumVariantValue,
+    ) -> Option<String> {
+        None
+    }
+
+    fn item_name(&self, _original_item_name: &str) -> Option<String> {
+        None
+    }
+
+    fn include_file(&self, _filename: &str) {}
 }
 
 fn main() {
